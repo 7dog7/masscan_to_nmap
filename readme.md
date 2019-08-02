@@ -5,7 +5,7 @@
 抄袭https://github.com/hellogoldsnakeman/masnmapscan-V1.0  
 能抄袭就抄袭,因为菜
 
-由于使用的时候遇到一些问题毕竟迷茫就自己拼凑了一下  
+由于使用的时候遇到一些问题，比较蜜汁就自己拼凑了一下  
 增加ip处理,多线程处理,过滤防火墙ip,获取http请求标题
 
 有问题和需求请Issues  
