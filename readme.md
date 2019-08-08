@@ -35,5 +35,23 @@
 4. 扫描启动
    >python scan.py
 
-
-
+  
+## 2019.8.8 更新如下:结果排序、状态、与返回包大小:  
+  
+文件:scan_url_port.txt
+```
+127.0.0.1:9002	dynamid
+127.0.0.1:8089	unknown
+127.0.0.1:3306	mysql
+127.0.0.1:3888	ciphire-serv
+127.0.0.1:2181	
+127.0.0.1:9001	tor-orport
+http://127.0.0.1:9002	dynamid	status:404	responseLen:0
+http://127.0.0.1:8080	http-proxy	status:404	responseLen:0
+http://127.0.0.1:8088	radan-http	status:404	responseLen:0
+http://127.0.0.1:9001	tor-orport	status:404	responseLen:127
+[*]主机 http://127.0.0.1:3888 端口服务为：ciphire-serv无法访问
+[*]主机 http://127.0.0.1:8089 端口服务为：unknown无法访问
+[*]主机 http://127.0.0.1:3306 端口服务为：mysql无法访问
+[*]主机 http://127.0.0.1:2181 端口服务为：无法访问
+```
