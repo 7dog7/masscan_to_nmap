@@ -8,6 +8,7 @@ import chardet
 import re
 import json
 import os
+import socket
 from threadPool import ThreadPool
 
 requests.packages.urllib3.disable_warnings()
@@ -17,6 +18,7 @@ reload(sys)
 sys.setdefaultencoding('utf8')
 
 final_domains = []
+
 
 # 调用masscan
 def portscan():
@@ -37,24 +39,24 @@ def portscan():
 # 获取网站的web应用程序名和网站标题信息
 def Title(scan_url_port, service_name):
     try:
-        r = requests.get(scan_url_port, timeout=3, verify=False)
+        r = requests.get(scan_url_port, timeout=5, verify=False)
         # 获取网站的页面编码
         r_detectencode = chardet.detect(r.content)
         actual_encode = r_detectencode['encoding']
         response = re.findall(u'<title>(.*?)</title>', r.content, re.S)
         if response == []:
-            final_domains.append(scan_url_port + '\t' + service_name)
+            final_domains.append(scan_url_port + '\t' + service_name + '\tstatus:' + str(r.status_code) + '\tresponseLen:' + str(len(r.content)))
         else:
             # 将页面解码为utf-8，获取中文标题
             res = response[0].decode(actual_encode).decode('utf-8')
             banner = r.headers['server']
-            final_domains.append(scan_url_port + '\t' + banner + '\t' + res)
+            final_domains.append(scan_url_port + '\t' + banner + '\t' + res + '\tstatus:' + str(r.status_code) + '\tresponseLen:' + str(len(r.content)))
     except Exception as e:
         final_domains.append('[*]主机 ' + scan_url_port + ' 端口服务为：' + service_name + '无法访问')
 
 
 # 调用nmap识别服务
-def NmapScan(scan_ip_port,data):
+def NmapScan(scan_ip_port, data):
     nm = nmap.PortScanner()
     try:
         scan_ip_port = scan_ip_port.split('|')
@@ -68,8 +70,10 @@ def NmapScan(scan_ip_port,data):
             else:
                 scan_url_port = 'http://' + scan_ip_port[1] + ':' + str(scan_ip_port[0])
                 Title(scan_url_port, service_name)
-        else:
+        else:  # 唱跳rap和篮球C+V ,又是嫌弃速度慢了删除这
             final_domains.append(scan_ip_port[1] + ':' + str(scan_ip_port[0]) + '\t' + service_name)
+            scan_url_port = 'http://' + scan_ip_port[1] + ':' + str(scan_ip_port[0])  # <--
+            Title(scan_url_port, service_name)  # <--
     except Exception as e:
         print e
         pass
@@ -118,6 +122,7 @@ def get_ip_list(ip):
             print "IP format error" + ip
     return ip_list_tmp
 
+
 def main():
     try:
         f = open(r'ip.txt', 'rb')
@@ -131,6 +136,7 @@ def main():
         data = []
         items = portscan()  # 进行masscan跑端口
         dataList = {}
+
         for i in items:
             i = i.split('|')
             if i[1] not in dataList:
@@ -139,7 +145,7 @@ def main():
         for i in dataList:
             if len(dataList[i]) >= 50:
                 for port in dataList[i]:
-                    items.remove(str(port) + '|' + str(i))#删除超过50个端口的
+                    items.remove(str(port) + '|' + str(i))  # 删除超过50个端口的
         pool = ThreadPool(20, 1000)
         pool.start(NmapScan, items, data, )
     except Exception as e:
@@ -154,8 +160,24 @@ if __name__ == '__main__':
     for tmp_domain in final_domains:
         if tmp_domain not in tmp_domians:
             tmp_domians.append(tmp_domain)
+    domain = {}
+    sortDomain = {}
     for url in tmp_domians:
-        with open(r'scan_url_port.txt', 'ab+') as ff:
-            ff.write(url + '\n')
+        if "[*]" in url:
+            domain[url] = '255.255.255.255'
+        elif "://" in url:
+            domain[url] = '254.254.254.254'
+        else:
+            domain[url] = url.split(':')[0]
+    for key in (sorted(list(set(domain.values())), key=socket.inet_aton)):
+        for i in domain:
+            if key in domain[i]:
+                if key not in sortDomain.keys():
+                    sortDomain[key] = []
+                sortDomain[key].append(i)
+    for i in (sorted(sortDomain.keys(), key=socket.inet_aton)):
+        for data in sortDomain[i]:
+            with open(r'scan_url_port.txt', 'ab+') as ff:
+                ff.write(data + '\n')
     spend_time = (datetime.datetime.now() - start_time).seconds
     print '程序共运行了： ' + str(spend_time) + '秒'
