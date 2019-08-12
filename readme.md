@@ -14,11 +14,12 @@
 
 安装
 
-1. Centos 安装 Masscan
+1. Centos 安装 Masscan (版本GIT version: 1.0.5-86-ga025970,版本低会导致-oJ masscan.json格式出现偏差导致报错)
     >yum install git gcc make libpcap-devel  
     git clone https://github.com/robertdavidgraham/masscan  
     cd masscan  
-    make
+    make  
+
 2. python依赖
     >pip install -r requirements.txt
     
