@@ -1,24 +1,5 @@
 #!/usr/bin/python
 # coding=utf-8
-
-import nmap
-import datetime
-import requests
-import chardet
-import re
-import json
-import os
-import socket
-from threadPool import ThreadPool
-
-requests.packages.urllib3.disable_warnings()
-import sys
-
-reload(sys)
-sys.setdefaultencoding('utf8')
-#!/usr/bin/python
-# coding=utf-8
-
 import nmap
 import datetime
 import requests
