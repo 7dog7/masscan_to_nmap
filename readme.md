@@ -16,6 +16,7 @@
 
 1. Centos 安装 Masscan (版本GIT version: 1.0.5-86-ga025970,版本低会导致-oJ masscan.json格式出现偏差导致报错)
     >yum install git gcc make libpcap-devel  
+    yum install nmap(如果没安装请安装)  
     git clone https://github.com/7dog7/masscan_to_nmap.git  
     git clone https://github.com/robertdavidgraham/masscan  
     cd masscan  
