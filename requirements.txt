@@ -2,3 +2,4 @@ chardet
 requests
 urllib3
 python-nmap
+IPy
