@@ -8,6 +8,8 @@ import re
 import json
 import os
 import socket
+from IPy import IP
+from prettytable import PrettyTable
 from threadPool import ThreadPool
 
 requests.packages.urllib3.disable_warnings()
@@ -24,7 +26,7 @@ def portscan():
     temp_ports = []  # 设定一个临时端口列表
     ports = []
     print './masscan/bin/masscan -iL scan_ip.txt -p 1-65535 -oJ masscan.json --rate 2000'
-    os.system('./masscan/bin/masscan -iL scan_ip.txt -p 1-65535 -oJ masscan.json --rate 2000')
+    # os.system('./masscan/bin/masscan -iL scan_ip.txt -p 1-65535 -oJ masscan.json --rate 2000')
     # 提取json文件中的端口
     with open('masscan.json', 'r') as f:
         for line in f:
@@ -40,7 +42,7 @@ def Title(scan_url_port, service_name):
     try:
         r = requests.get(scan_url_port, timeout=5, verify=False, stream=True)
         # 获取网站的页面编码
-        if 'Content-Length' in r.headers.keys() and int(r.headers['Content-Length']) > 5000000:#有些人特别坏访问端口让你下载个几g的文件
+        if 'Content-Length' in r.headers.keys() and int(r.headers['Content-Length']) > 5000000:  # 有些人特别坏访问端口让你下载个几g的文件
             final_domains.append('[*]主机 ' + scan_url_port + ' 端口服务为：' + service_name + '大文件')
         else:
             r_detectencode = chardet.detect(r.content)
@@ -48,16 +50,18 @@ def Title(scan_url_port, service_name):
             response = re.findall(u'<title>(.*?)</title>', r.content, re.S)
             if response == []:
                 final_domains.append(
-                    scan_url_port + '\t' + service_name + '\tstatus:' + str(r.status_code) + '\tresponseLen:' + str(
+                    scan_url_port + '\t \t' + "".join(service_name.split()) + '\t' + str(r.status_code) + '\t' + str(
                         len(r.content)))
             else:
                 # 将页面解码为utf-8，获取中文标题
                 res = response[0].decode(actual_encode).decode('utf-8')
                 banner = r.headers['server']
-                final_domains.append(scan_url_port + '\t' + banner + '\t' + res + '\tstatus:' + str(
-                    r.status_code) + '\tresponseLen:' + str(len(r.content)))
+                final_domains.append(
+                    scan_url_port + '\t' + "".join(banner.split()) + '\t' + ''.join(res.split()) + '\t' + str(
+                        r.status_code) + '\t' + str(len(r.content)))
     except Exception as e:
-        final_domains.append('[*]主机 ' + scan_url_port + ' 端口服务为：' + service_name + '无法访问')
+        pass
+        # final_domains.append('[*]主机 ' + scan_url_port + ' 端口服务为：' + service_name + '无法访问')
 
 
 # 调用nmap识别服务
@@ -76,9 +80,9 @@ def NmapScan(scan_ip_port, data):
                 scan_url_port = 'http://' + scan_ip_port[1] + ':' + str(scan_ip_port[0])
                 Title(scan_url_port, service_name)
         else:  # 唱跳rap和篮球C+V ,又是嫌弃速度慢了删除这
-            final_domains.append(scan_ip_port[1] + ':' + str(scan_ip_port[0]) + '\t' + service_name)
             scan_url_port = 'http://' + scan_ip_port[1] + ':' + str(scan_ip_port[0])  # <--
             Title(scan_url_port, service_name)  # <--
+        final_domains.append(scan_ip_port[1] + ':' + str(scan_ip_port[0]) + '\t' + service_name)
     except Exception as e:
         print e
         pass
@@ -108,6 +112,10 @@ def get_ip_list(ip):
                 ip_list_tmp.append(ip[:ip.rfind('.')] + '.' + numtoip(ip_num))
         else:
             print 'IP format error' + ip
+    elif '/' in ip:
+        ip = IP(ip)  # 直接用库吧
+        for i in ip:
+            ip_list_tmp.append(i)
     else:
         ip_split = ip.split('.')
         net = len(ip_split)
@@ -167,11 +175,13 @@ if __name__ == '__main__':
             tmp_domians.append(tmp_domain)
     domain = {}
     sortDomain = {}
+    result = {}
+    resultSortDomain = {}
     for url in tmp_domians:
         if "[*]" in url:
             domain[url] = '255.255.255.255'
         elif "://" in url:
-            domain[url] = '254.254.254.254'
+            result[url] = url[url.index("//") + 2:url.find(":", url.index(":") + 1)]
         else:
             domain[url] = url.split(':')[0]
     for key in (sorted(list(set(domain.values())), key=socket.inet_aton)):
@@ -180,9 +190,26 @@ if __name__ == '__main__':
                 if key not in sortDomain.keys():
                     sortDomain[key] = []
                 sortDomain[key].append(i)
-    for i in (sorted(sortDomain.keys(), key=socket.inet_aton)):
-        for data in sortDomain[i]:
-            with open(r'scan_url_port.txt', 'ab+') as ff:
+
+    for key in (sorted(list(set(result.values())), key=socket.inet_aton)):
+        for i in result:
+            if key in result[i]:
+                if key not in resultSortDomain.keys():
+                    resultSortDomain[key] = []
+                resultSortDomain[key].append(i)
+
+    with open(r'scan_url_port.txt', 'ab+') as ff:
+        for i in (sorted(sortDomain.keys(), key=socket.inet_aton)):
+            for data in sortDomain[i]:
                 ff.write(data + '\n')
+
+        x = PrettyTable(["URL", "容器", "标题", "状态", "返回包长度"])
+
+        for i in (sorted(resultSortDomain.keys(), key=socket.inet_aton)):
+            for data in resultSortDomain[i]:
+                data = data.split("\t")
+                x.add_row([data[0], data[1], data[2], data[3], data[4]])
+        ff.write(str(x) + '\n')
+
     spend_time = (datetime.datetime.now() - start_time).seconds
     print '程序共运行了： ' + str(spend_time) + '秒'
