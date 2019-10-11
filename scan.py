@@ -92,6 +92,7 @@ def NmapScan(scan_ip_port, data):
 
 
 def get_ip_list(ip):
+    print ip
     ip_list_tmp = []
 
     def iptonum(x):
@@ -113,7 +114,7 @@ def get_ip_list(ip):
         else:
             print 'IP format error' + ip
     elif '/' in ip:
-        ip = IP(ip)  # 直接用库吧
+        ip = IP(ip, make_net=1)  # 直接用库吧
         for i in ip:
             ip_list_tmp.append(i)
     else:
@@ -143,7 +144,8 @@ def main():
         for line in f.readlines():
             final_ip = line.strip('\n')
             for i in get_ip_list(final_ip):
-                ip += i + '\n'
+                print i
+                ip += str(i).strip() + '\n'
         with open(r'scan_ip.txt', 'w') as ff:
             ff.write(ip)
         data = []
