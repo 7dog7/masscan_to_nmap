@@ -25,8 +25,8 @@ final_domains = []
 def portscan():
     temp_ports = []  # 设定一个临时端口列表
     ports = []
-    print './masscan/bin/masscan -iL scan_ip.txt -p 1-65535 -oJ masscan.json --rate 2000'
-    os.system('./masscan/bin/masscan -iL scan_ip.txt -p 1-65535 -oJ masscan.json --rate 2000')
+    print '../masscan/bin/masscan -iL scan_ip.txt -p 1-65535 -oJ masscan.json --rate 2000'
+    os.system('../masscan/bin/masscan -iL scan_ip.txt -p 1-65535 -oJ masscan.json --rate 2000')
     # 提取json文件中的端口
     with open('masscan.json', 'r') as f:
         for line in f:
@@ -165,6 +165,7 @@ def main():
         pool.start(NmapScan, items, data, )
     except Exception as e:
         print e
+        print 'Ip.Txt A Certain Line Format Error'
         pass
 
 
