@@ -53,3 +53,6 @@
 |   https://127.0.0.1:443    |                                                 |                Loading...                | 200  |    2709    |
 |    http://127.0.0.1:80     |                                                 |                   http                   | 200  |    6867    |
 ```
+
+##建议扫描完毕后使用python -m SimpleHTTPServer 8033,来启动web服务来访问
+##浏览器安装Charset,使用Unicode(UTF-8)显示中文
