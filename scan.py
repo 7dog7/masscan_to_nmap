@@ -42,7 +42,7 @@ def Title(scan_url_port, service_name):
     try:
         r = requests.get(scan_url_port, timeout=5, verify=False, stream=True)
         # 获取网站的页面编码
-        if 'Content-Length' in r.headers.keys() and int(r.headers['Content-Length']) > 5000000:  # 有些人特别坏访问端口让你下载个几g的文件
+        if 'Content-Length' in r.headers.keys() and int(r.headers['Content-Length']) > 50000:  # 有些人特别坏访问端口让你下载个几g的文件
             final_domains.append('[*]主机 ' + scan_url_port + ' 端口服务为：' + service_name + '大文件')
         else:
             r_detectencode = chardet.detect(r.content)
