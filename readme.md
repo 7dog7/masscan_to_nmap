@@ -17,7 +17,7 @@
 
 ## 安装使用
 
-安装(建议把masscan编译在这个masscan_to_nmap目录下,这样就不用修改代码了)
+安装(建议把masscan编译在这个masscan_to_nmap目录同级,这样就不用修改代码了)
 
 1. Centos 安装 Masscan (版本GIT version: 1.0.5-86-ga025970,版本低会导致-oJ masscan.json格式出现偏差导致报错)
     >yum install git gcc make libpcap-devel  
