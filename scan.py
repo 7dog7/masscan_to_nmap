@@ -31,7 +31,7 @@ def portscan():
     with open('masscan.json', 'r') as f:
         for line in f:
             if line.startswith('{ '):
-                temp = json.loads(line)
+                temp = json.loads(line[:-2])
                 temp1 = temp["ports"][0]
                 ports.append(str(temp1["port"]) + '|' + temp["ip"])
     return ports
